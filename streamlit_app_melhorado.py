@@ -19,19 +19,27 @@ def load_data():
     try:
         # Tenta carregar dados de um arquivo local
         df = pd.read_excel("coleta_centro_dados.xlsx")
+        # Garante que a coluna 'Mês' exista e seja do tipo string
+        if 'Mês' not in df.columns:
+            st.error("Erro: A planilha não contém a coluna 'Mês'. Por favor, verifique o formato.")
+            return pd.DataFrame() # Retorna DataFrame vazio para evitar erros subsequentes
+        df['Mês'] = df['Mês'].astype(str)
         return df
     except FileNotFoundError:
-        # Se não encontrar, cria dados de exemplo
+        st.warning("Arquivo 'coleta_centro_dados.xlsx' não encontrado. Criando dados de exemplo.")
         return create_sample_data()
+    except Exception as e:
+        st.error(f"Ocorreu um erro ao carregar a planilha: {e}")
+        return pd.DataFrame()
 
 def create_sample_data():
     """Cria dados de exemplo para demonstração"""
-    meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio']
+    meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
     data = {
         'Mês': meses,
-        'Coleta AM': [295, 1021, 408, 1192, 1045],
-        'Coleta PM': [760, 1636, 793, 1606, 1461],
-        'Total de Sacos': [1055, 2657, 1201, 2798, 2506]
+        'Coleta AM': [295, 1021, 408, 1192, 1045, 0, 0, 0, 0, 0, 0, 0],
+        'Coleta PM': [760, 1636, 793, 1606, 1461, 0, 0, 0, 0, 0, 0, 0],
+        'Total de Sacos': [1055, 2657, 1201, 2798, 2506, 0, 0, 0, 0, 0, 0, 0]
     }
     return pd.DataFrame(data)
 
@@ -76,11 +84,11 @@ def create_metric_card(title, value, delta=None, delta_color="normal"):
 
 # Título principal
 st.markdown("""
-<div style='text-align: center; padding: 20px;'>
-    <h1 style='color: #00D4FF; font-size: 3em; margin-bottom: 10px;'>
+<div style=\'text-align: center; padding: 20px;\'>
+    <h1 style=\'color: #00D4FF; font-size: 3em; margin-bottom: 10px;\'>
         🚛 Coleta Centro
     </h1>
-    <p style='color: #888; font-size: 1.2em;'>
+    <p style=\'color: #888; font-size: 1.2em;\'>
         Dashboard de Gestão de Resíduos e Segurança
     </p>
 </div>
@@ -89,6 +97,11 @@ st.markdown("""
 # Carregamento de dados
 df = load_data()
 trend_df = create_trend_data()
+
+# Verifica se o DataFrame principal está vazio
+if df.empty:
+    st.info("Nenhum dado disponível para exibição. Por favor, carregue uma planilha ou verifique o arquivo 'coleta_centro_dados.xlsx'.")
+    st.stop() # Para a execução do script se não houver dados
 
 # Sidebar para filtros
 with st.sidebar:
@@ -108,6 +121,7 @@ with st.sidebar:
             else:
                 df = pd.read_csv(uploaded_file)
             st.success("✅ Dados atualizados com sucesso!")
+            st.experimental_rerun() # Recarrega a página para aplicar os novos dados
         except Exception as e:
             st.error(f"❌ Erro ao carregar arquivo: {e}")
     
@@ -356,9 +370,13 @@ st.dataframe(
 # Footer
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; color: #666; padding: 20px;'>
+<div style=\'text-align: center; color: #666; padding: 20px;\'>
     <p>🚛 Dashboard de Coleta Centro | Atualizado automaticamente</p>
     <p>💡 Para atualizar os dados, use o upload na barra lateral</p>
 </div>
 """, unsafe_allow_html=True)
+
+
+
+
 
