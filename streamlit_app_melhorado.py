@@ -19,14 +19,14 @@ def load_data():
     try:
         # Tenta carregar dados de um arquivo local
         df = pd.read_excel("coleta_centro_dados.xlsx")
-        # Garante que a coluna 'Mês' exista e seja do tipo string
-        if 'Mês' not in df.columns:
-            st.error("Erro: A planilha não contém a coluna 'Mês'. Por favor, verifique o formato.")
+        # Garante que a coluna \'Mês\' exista e seja do tipo string
+        if \'Mês\' not in df.columns:
+            st.error("Erro: A planilha não contém a coluna \'Mês\'. Por favor, verifique o formato.")
             return pd.DataFrame() # Retorna DataFrame vazio para evitar erros subsequentes
-        df['Mês'] = df['Mês'].astype(str)
+        df[\'Mês\'] = df[\'Mês\'].astype(str)
         return df
     except FileNotFoundError:
-        st.warning("Arquivo 'coleta_centro_dados.xlsx' não encontrado. Criando dados de exemplo.")
+        st.warning("Arquivo \'coleta_centro_dados.xlsx\' não encontrado. Criando dados de exemplo.")
         return create_sample_data()
     except Exception as e:
         st.error(f"Ocorreu um erro ao carregar a planilha: {e}")
@@ -36,16 +36,16 @@ def create_sample_data():
     """Cria dados de exemplo para demonstração"""
     meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
     data = {
-        'Mês': meses,
-        'Coleta AM': [295, 1021, 408, 1192, 1045, 0, 0, 0, 0, 0, 0, 0],
-        'Coleta PM': [760, 1636, 793, 1606, 1461, 0, 0, 0, 0, 0, 0, 0],
-        'Total de Sacos': [1055, 2657, 1201, 2798, 2506, 0, 0, 0, 0, 0, 0, 0]
+        \'Mês\': meses,
+        \'Coleta AM\': [295, 1021, 408, 1192, 1045, 0, 0, 0, 0, 0, 0, 0],
+        \'Coleta PM\': [760, 1636, 793, 1606, 1461, 0, 0, 0, 0, 0, 0, 0],
+        \'Total de Sacos\': [1055, 2657, 1201, 2798, 2506, 0, 0, 0, 0, 0, 0, 0]
     }
     return pd.DataFrame(data)
 
 def create_trend_data():
-    """Cria dados de tendência diária para demonstração"""
-    dates = pd.date_range(start='2024-01-01', end='2024-05-31', freq='D')
+    """Cria dados de tendência diária para demonstração (ano 2025)"""
+    dates = pd.date_range(start=\'2025-01-01\', end=\'2025-05-31\', freq=\'D\') # Alterado para 2025
     np.random.seed(42)
     
     trend_data = []
@@ -55,11 +55,11 @@ def create_trend_data():
         peso_kg = (am_sacos + pm_sacos) * np.random.uniform(18, 22)
         
         trend_data.append({
-            'Data': date,
-            'Sacos_AM': am_sacos,
-            'Sacos_PM': pm_sacos,
-            'Total_Sacos': am_sacos + pm_sacos,
-            'Peso_Total_kg': round(peso_kg, 1)
+            \'Data\': date,
+            \'Sacos_AM\': am_sacos,
+            \'Sacos_PM\': pm_sacos,
+            \'Total_Sacos\': am_sacos + pm_sacos,
+            \'Peso_Total_kg\': round(peso_kg, 1)
         })
     
     return pd.DataFrame(trend_data)
@@ -100,7 +100,7 @@ trend_df = create_trend_data()
 
 # Verifica se o DataFrame principal está vazio
 if df.empty:
-    st.info("Nenhum dado disponível para exibição. Por favor, carregue uma planilha ou verifique o arquivo 'coleta_centro_dados.xlsx'.")
+    st.info("Nenhum dado disponível para exibição. Por favor, carregue uma planilha ou verifique o arquivo \'coleta_centro_dados.xlsx\'.")
     st.stop() # Para a execução do script se não houver dados
 
 # Sidebar para filtros
@@ -110,13 +110,13 @@ with st.sidebar:
     # Upload de arquivo
     uploaded_file = st.file_uploader(
         "📁 Carregar nova planilha",
-        type=['xlsx', 'csv'],
+        type=[\'xlsx\', \'csv\'],
         help="Faça upload de uma nova planilha para atualizar os dados"
     )
     
     if uploaded_file is not None:
         try:
-            if uploaded_file.name.endswith('.xlsx'):
+            if uploaded_file.name.endswith(\".xlsx\"):
                 df = pd.read_excel(uploaded_file)
             else:
                 df = pd.read_csv(uploaded_file)
@@ -126,7 +126,7 @@ with st.sidebar:
             st.error(f"❌ Erro ao carregar arquivo: {e}")
     
     # Filtro de mês
-    meses_disponiveis = df['Mês'].unique().tolist()
+    meses_disponiveis = df[\'Mês\'].unique().tolist()
     mes_selecionado = st.selectbox(
         "📅 Selecione o mês:",
         meses_disponiveis,
@@ -137,29 +137,29 @@ with st.sidebar:
     st.subheader("📊 Análise de Tendência")
     periodo_inicio = st.date_input(
         "Data início",
-        value=trend_df['Data'].min(),
-        min_value=trend_df['Data'].min(),
-        max_value=trend_df['Data'].max()
+        value=trend_df[\'Data\'].min(),
+        min_value=trend_df[\'Data\'].min(),
+        max_value=trend_df[\'Data\'].max()
     )
     periodo_fim = st.date_input(
         "Data fim",
-        value=trend_df['Data'].max(),
-        min_value=trend_df['Data'].min(),
-        max_value=trend_df['Data'].max()
+        value=trend_df[\'Data\'].max(),
+        min_value=trend_df[\'Data\'].min(),
+        max_value=trend_df[\'Data\'].max()
     )
 
 # Filtrar dados
-df_filtrado = df[df['Mês'] == mes_selecionado]
+df_filtrado = df[df[\'Mês\'] == mes_selecionado]
 trend_filtrado = trend_df[
-    (trend_df['Data'] >= pd.to_datetime(periodo_inicio)) &
-    (trend_df['Data'] <= pd.to_datetime(periodo_fim))
+    (trend_df[\'Data\'] >= pd.to_datetime(periodo_inicio)) &
+    (trend_df[\'Data\'] <= pd.to_datetime(periodo_fim))
 ]
 
 # Calcular métricas
 if not df_filtrado.empty:
-    total_sacos = df_filtrado['Total de Sacos'].iloc[0]
-    coleta_am = df_filtrado['Coleta AM'].iloc[0]
-    coleta_pm = df_filtrado['Coleta PM'].iloc[0]
+    total_sacos = df_filtrado[\'Total de Sacos\'].iloc[0]
+    coleta_am = df_filtrado[\'Coleta AM\'].iloc[0]
+    coleta_pm = df_filtrado[\'Coleta PM\'].iloc[0]
     peso_total = total_sacos * 20  # Estimativa de 20kg por saco
     
     # Calcular variação (simulada)
@@ -213,32 +213,32 @@ with col1:
         fig_bar = go.Figure()
         
         fig_bar.add_trace(go.Bar(
-            name='Manhã (AM)',
-            x=['Coleta'],
+            name=\'Manhã (AM)\',
+            x=[\'Coleta\'],
             y=[coleta_am],
-            marker_color='#00D4FF',
-            text=[f'{coleta_am}'],
-            textposition='auto',
+            marker_color=\'#00D4FF\',
+            text=[f\'{coleta_am}\'
+            textposition=\'auto\',
         ))
         
         fig_bar.add_trace(go.Bar(
-            name='Tarde (PM)',
-            x=['Coleta'],
+            name=\'Tarde (PM)\',
+            x=[\'Coleta\'],
             y=[coleta_pm],
-            marker_color='#FF6B35',
-            text=[f'{coleta_pm}'],
-            textposition='auto',
+            marker_color=\'#FF6B35\',
+            text=[f\'{coleta_pm}\'
+            textposition=\'auto\',
         ))
         
         fig_bar.update_layout(
             template="plotly_dark",
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor=\'rgba(0,0,0,0)\',
+            paper_bgcolor=\'rgba(0,0,0,0)\',
             showlegend=True,
             height=400,
             xaxis_title="Período",
             yaxis_title="Quantidade de Sacos",
-            font=dict(color='white')
+            font=dict(color=\'white\')
         )
         
         st.plotly_chart(fig_bar, use_container_width=True)
@@ -247,20 +247,20 @@ with col2:
     st.subheader("🥧 Distribuição AM vs PM")
     if total_sacos > 0:
         fig_pie = go.Figure(data=[go.Pie(
-            labels=['Manhã (AM)', 'Tarde (PM)'],
+            labels=[\'Manhã (AM)\', \'Tarde (PM)\\'],
             values=[coleta_am, coleta_pm],
             hole=0.4,
-            marker_colors=['#00D4FF', '#FF6B35'],
-            textinfo='label+percent+value',
+            marker_colors=[\'#00D4FF\', \'#FF6B35\'],
+            textinfo=\'label+percent+value\',
             textfont_size=12,
         )])
         
         fig_pie.update_layout(
             template="plotly_dark",
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor=\'rgba(0,0,0,0)\',
+            paper_bgcolor=\'rgba(0,0,0,0)\',
             height=400,
-            font=dict(color='white'),
+            font=dict(color=\'white\'),
             showlegend=False
         )
         
@@ -272,38 +272,38 @@ if not trend_filtrado.empty:
     fig_trend = go.Figure()
     
     fig_trend.add_trace(go.Scatter(
-        x=trend_filtrado['Data'],
-        y=trend_filtrado['Total_Sacos'],
-        mode='lines+markers',
-        name='Total de Sacos',
-        line=dict(color='#00D4FF', width=3),
-        marker=dict(size=6, color='#00D4FF')
+        x=trend_filtrado[\'Data\'],
+        y=trend_filtrado[\'Total_Sacos\'],
+        mode=\'lines+markers\',
+        name=\'Total de Sacos\',
+        line=dict(color=\'#00D4FF\', width=3),
+        marker=dict(size=6, color=\'#00D4FF\')
     ))
     
     fig_trend.add_trace(go.Scatter(
-        x=trend_filtrado['Data'],
-        y=trend_filtrado['Peso_Total_kg']/10,  # Escala para visualização
-        mode='lines+markers',
-        name='Peso Total (kg/10)',
-        line=dict(color='#FF6B35', width=3),
-        marker=dict(size=6, color='#FF6B35'),
-        yaxis='y2'
+        x=trend_filtrado[\'Data\'],
+        y=trend_filtrado[\'Peso_Total_kg\']/10,  # Escala para visualização
+        mode=\'lines+markers\',
+        name=\'Peso Total (kg/10)\',
+        line=dict(color=\'#FF6B35\', width=3),
+        marker=dict(size=6, color=\'#FF6B35\'),
+        yaxis=\'y2\'
     ))
     
     fig_trend.update_layout(
         template="plotly_dark",
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor=\'rgba(0,0,0,0)\',
+        paper_bgcolor=\'rgba(0,0,0,0)\',
         height=400,
         xaxis_title="Data",
         yaxis_title="Quantidade de Sacos",
         yaxis2=dict(
             title="Peso (kg/10)",
-            overlaying='y',
-            side='right'
+            overlaying=\'y\',
+            side=\'right\'
         ),
-        font=dict(color='white'),
-        hovermode='x unified'
+        font=dict(color=\'white\'),
+        hovermode=\'x unified\'
     )
     
     st.plotly_chart(fig_trend, use_container_width=True)
@@ -318,21 +318,21 @@ with col1:
     st.subheader("📊 Coleta por Mês")
     fig_monthly = px.bar(
         df,
-        x='Mês',
-        y=['Coleta AM', 'Coleta PM'],
+        x=\'Mês\',
+        y=[\'Coleta AM\', \'Coleta PM\'],
         title="Coleta Mensal por Período",
         color_discrete_map={
-            'Coleta AM': '#00D4FF',
-            'Coleta PM': '#FF6B35'
+            \'Coleta AM\': \'#00D4FF\',
+            \'Coleta PM\': \'#FF6B35\'
         },
         template="plotly_dark"
     )
     
     fig_monthly.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor=\'rgba(0,0,0,0)\',
+        paper_bgcolor=\'rgba(0,0,0,0)\',
         height=400,
-        font=dict(color='white')
+        font=dict(color=\'white\')
     )
     
     st.plotly_chart(fig_monthly, use_container_width=True)
@@ -341,19 +341,19 @@ with col2:
     st.subheader("📈 Evolução do Total")
     fig_evolution = px.line(
         df,
-        x='Mês',
-        y='Total de Sacos',
+        x=\'Mês\',
+        y=\'Total de Sacos\',
         title="Evolução Mensal da Coleta",
         markers=True,
-        color_discrete_sequence=['#00D4FF'],
+        color_discrete_sequence=[\'#00D4FF\'],
         template="plotly_dark"
     )
     
     fig_evolution.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor=\'rgba(0,0,0,0)\',
+        paper_bgcolor=\'rgba(0,0,0,0)\',
         height=400,
-        font=dict(color='white')
+        font=dict(color=\'white\')
     )
     
     st.plotly_chart(fig_evolution, use_container_width=True)
@@ -375,8 +375,6 @@ st.markdown("""
     <p>💡 Para atualizar os dados, use o upload na barra lateral</p>
 </div>
 """, unsafe_allow_html=True)
-
-
 
 
 
